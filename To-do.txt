@@ -1,0 +1,65 @@
+1 of 40 completed
+3%
+Step 1
+Python — build trading tooling
+
+Write a script that hits the Binance API and prints a live BTC/USDT price update every 5 seconds
+Write a script that downloads 1-minute OHLCV candles for any ticker from Binance and saves them to a CSV
+Write a web scraper that pulls new token listings and their metadata (market cap, volume, age) from DEX Screener
+Load your OHLCV CSV in Pandas and compute SMA(20), SMA(50), EMA(12), and EMA(26) as new columns
+Plot price + two moving averages on a single Matplotlib chart with labeled axes and a legend
+Build a backtester function that takes a DataFrame of buy/sell signals and returns total PnL, win rate, and max drawdown
+ concept gate — sharpe ratio
+Look up Sharpe ratio. Add it as an output to your backtester. Then write two sentences: what does a Sharpe of 1.5 mean, and why is it more useful to a quant than raw PnL?
+Build a FastAPI endpoint that accepts a ticker symbol and returns its current price and 24h change from Binance
+Step 2
+Data — build your financial datasets
+
+Download 5 years of EUR/USD 1-hour OHLCV data and store it in a SQLite database
+Write SQL queries that answer: which hour of the day is most volatile, and what is the average daily range in pips
+Clean the forex dataset in Pandas: drop weekend rows, fill forward any gaps, normalize all timestamps to UTC
+Compute RSI(14), MACD(12,26,9), and Bollinger Bands(20) on the EUR/USD data and add them as columns
+Plot a Seaborn correlation heatmap across EUR/USD, GBP/USD, USD/JPY, AUD/USD, and USD/CAD
+ concept gate — data leakage
+Look up "data leakage in financial machine learning." Write two sentences: what is it, and give one concrete example of how your RSI column could accidentally encode future price information into your training data.
+Build a feature engineering pipeline that produces lag features (1, 3, 5, 10 candles back) and rolling stats (mean, std, min, max over 20 periods) — double-check each feature for leakage before keeping it
+Build the same pipeline for your memecoin dataset: add volume spike %, price change %, and time-since-listing as features
+Step 3
+AI APIs — build sentiment tooling for crypto
+
+Write a script that sends 100 crypto tweets to the OpenAI or Claude API and saves each labeled bullish / bearish / neutral to a CSV
+Build a Streamlit app: user types a coin name, app fetches recent tweets, runs them through the API, and shows an overall sentiment score
+Set up Ollama locally and run a model that summarizes a crypto project whitepaper you feed it as a text file
+Build a RAG pipeline (LangChain + Chroma or FAISS) that answers questions about a trading strategy doc you give it
+Step 4
+Core ML — train models on your actual data
+
+Train a logistic regression model to predict EUR/USD direction (up or down) 15 minutes ahead using your engineered features
+Evaluate it and print: accuracy, precision, recall, F1 score, and a confusion matrix
+Train a Random Forest on the same forex task — compare all metrics against logistic regression in a printed table
+ concept gate — look-ahead bias
+Look up "look-ahead bias in backtesting." Write two sentences: what is it, and why does a random 80/20 train-test split on your EUR/USD time series violate it — even if your features are clean?
+Implement walk-forward validation: train on months 1–6, test on 7, retrain on 1–7, test on 8, and so on — record Sharpe and accuracy at each fold
+ concept gate — overfitting to market regimes
+Look up "overfitting to market regimes in ML." Write two sentences: why would a model trained on 2021 bull-market memecoin data likely fail in 2022, and name one thing you could do to make your model more regime-robust.
+Train a classification model on your memecoin dataset to predict whether a coin will 2x within 24 hours of listing
+ concept gate — model architecture justification
+Before building the LSTM, write two sentences answering: why not just use a Random Forest here? What property of an LSTM makes it more suited to sequential price data — and what does it cost you to use it?
+Train an LSTM in PyTorch to predict next-candle EUR/USD close price — plot predicted vs. actual on a chart
+Write a model card for each model: training data, features used, best metric scores, and at least two known limitations
+Step 5
+LLMs and agents — automate your research pipeline
+
+Build an n8n workflow that monitors DEX Screener for new listings, scores them using your memecoin features, and sends a Telegram alert with the score and key stats
+Build a LangChain agent that fetches live price data and recent news for a given coin and outputs a structured market summary
+Use Cursor or Windsurf to build a trading dashboard (price chart + model signal + sentiment score) — use its AI features throughout the whole build
+Try v0, Bolt, or Lovable to generate the frontend for one of your tools — connect it to your existing Python backend
+Step 6
+Ship — the two final models
+
+Memecoin model: full pipeline in one runnable repo — DEX Screener scraper → feature engineering → trained classifier → walk-forward backtest → Sharpe ratio output → signal generation
+Forex model: full pipeline in one runnable repo — data ingestion → feature engineering → LSTM or ensemble → walk-forward backtest → Sharpe ratio output → signal generation
+Write a one-page teardown for each model: what it does, what data it was trained on, your actual metric scores, and what you would improve next
+Publish both repos on GitHub with a README that includes: what the model does, how to run it, and a results table with real numbers
+Update your resume to name both models explicitly — include model type, asset class, validation method, and your best Sharpe and accuracy figures
+Apply to 5 ML or quant roles — tailor each application to whichever model is more relevant to that firm
