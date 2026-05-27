@@ -2,7 +2,6 @@ import requests
 from datetime import timedelta, datetime
 import os
 import time
-import json
 import csv
 
 time_frame = input("How many days back from today do you wanna scrape(1d,2d,3d,4d...) ")
