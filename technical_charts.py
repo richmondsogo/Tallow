@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-from pathlib import Path
+
 
 # 1. Load data and explicitly parse the Date column
 file_path = r"C:\Users\Richmond\Desktop\Codebase\Tallow\reports\trend_following_indicators\binance_OHLCV_BTCUSDT_1m_2026-05-30_14-21-02_with_indicators.csv"
