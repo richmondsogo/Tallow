@@ -159,7 +159,7 @@ try:
     start_unix_ms, end_unix_ms = to_unix_ms(start, end)
 
     symbol = "BTCUSDT"
-    interval = "1m"
+    interval = "1h"
 
     # 1. Fetch paginated OHLCV data first
     OHLCV_data = fetch_ohlcv(symbol, interval, start_unix_ms, end_unix_ms)
