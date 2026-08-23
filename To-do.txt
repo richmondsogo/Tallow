@@ -1,7 +1,7 @@
 1 of 40 completed
 3%
 Step 1
-Python — build trading tooling
+Python — build trading tooling.
 
 Write a script that hits the Binance API and prints a live BTC/USDT price update every 5 seconds
 Write a script that downloads 1-minute OHLCV candles for any ticker from Binance and saves them to a CSV
