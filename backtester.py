@@ -1,10 +1,15 @@
+import multiprocessing
 import pandas as pd
 from backtesting import Backtest, Strategy
 from backtesting.lib import crossover
 
+# Force Windows optimization process pool
+multiprocessing.freeze_support()
+multiprocessing.set_start_method("spawn", force=True)
+
 # --- 1. LOAD YOUR CUSTOM CSV DATA ---
 df = pd.read_csv(
-    "C:\\Users\\Richmond\\Desktop\\Codebase\\Tallow\\reports\\OHLCV_data\\binance_OHLCV_BTCUSDT_1h_2026-06-09_01-39-26.csv"
+    r"C:\Users\Richmond\Desktop\Codebase\Tallow\reports\OHLCV_data\binance_OHLCV_BTCUSDT_1h_2026-06-09_01-39-26.csv"
 )
 df.columns = df.columns.str.strip().str.lower()
 df = df.rename(
@@ -34,7 +39,7 @@ def EMA(values, n):
 def ATR(high, low, close, n=14):
     """Calculates Average True Range for smart stop losses"""
     h = pd.Series(high)
-    l = pd.Series(low)  # noqa: E741
+    l = pd.Series(low)
     c = pd.Series(close)
     tr1 = h - l
     tr2 = (h - c.shift()).abs()
@@ -75,35 +80,34 @@ class TrendFilterCrossover(Strategy):
         if current_price > current_sma50:
             if crossover(self.ema12, self.ema26):  # type: ignore
                 sl_price = current_price - (self.atr_multiplier * current_atr)
-                self.buy(sl=sl_price)
+                self.buy(sl=sl_price, size=0.95)
 
         elif current_price < current_sma50:
             if crossover(self.ema26, self.ema12):  # type: ignore
                 sl_price = current_price + (self.atr_multiplier * current_atr)
-                self.sell(sl=sl_price)
+                self.sell(sl=sl_price, size=0.95)
 
 
-# --- 4. RUN THE ENGINE ---
-bt = Backtest(
-    df,
-    TrendFilterCrossover,
-    cash=100_000_000,
-    commission=0.0001,  # 0.01% fee VIP tier
-    exclusive_orders=True,
-    finalize_trades=True,
-)
+# --- 4. RUN ENGINE GUARD ---
+if __name__ == "__main__":
+    bt = Backtest(
+        df,
+        TrendFilterCrossover,
+        cash=100_000,
+        commission=0.001,  # 0.1% binance spot default fee
+        exclusive_orders=True,
+        finalize_trades=True,
+    )
 
+    stats, heatmap = bt.optimize(  # type: ignore
+        ema_fast_period=range(10, 40, 5),
+        ema_slow_period=range(40, 80, 5),
+        atr_multiplier=[2.0, 2.5, 3.0, 3.5, 4.0],
+        maximize="Equity Final [$]",
+        constraint=lambda p: p.ema_fast_period < p.ema_slow_period,  # type: ignore
+        return_heatmap=True,
+    )
 
-stats, heatmap = bt.optimize(  # type: ignore
-    ema_fast_period=range(10, 40, 5),
-    ema_slow_period=range(40, 80, 5),
-    atr_multiplier=[2.0, 2.5, 3.0, 3.5, 4.0],
-    maximize="Equity Final [$]",
-    constraint=lambda p: p.ema_fast_period < p.ema_slow_period,  # type: ignore
-    return_heatmap=True,
-)
-
-print(stats)
-print("\n--- BEST PARAMETERS FOUND ---")
-# print(stats._strategy)
-
+    print(stats)
+    print("\n--- BEST PARAMETERS FOUND ---")
+    print(stats._strategy)
