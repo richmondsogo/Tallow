@@ -1,0 +1,36 @@
+import ccxt
+import pandas as pd
+from sqlalchemy import create_engine
+
+# 1. Establish Database Connection (PostgreSQL example)
+# Format: postgresql://username:password@localhost:port/database_name
+DB_URI = "postgresql://postgres:secret_password@localhost:5432/trading_db"
+engine = create_engine(DB_URI)
+
+def fetch_and_store_ohlcv(symbol, timeframe, limit=100):
+    print(f"Fetching data for {symbol}...")
+    
+    # 2. Extract Data via Exchange API
+    exchange = ccxt.binance({'enableRateLimit': True})
+    raw_candles = exchange.fetch_ohlcv(symbol, timeframe, limit=limit)
+    
+    # 3. Format Data into Dataframe
+    columns = ['timestamp', 'open', 'high', 'low', 'close', 'volume']
+    df = pd.DataFrame(raw_candles, columns=columns)
+    
+    # Format Unix timestamp millisecond metrics into readable datetime strings
+    df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+    df['symbol'] = symbol
+    df['timeframe'] = timeframe
+    
+    # Reorder columns to align exactly with your SQL schema mapping
+    df = df[['timestamp', 'symbol', 'timeframe', 'open', 'high', 'low', 'close', 'volume']]
+    
+    # 4. Stream Data into the SQL Engine
+    # Uses 'append' so existing records are kept intact.
+    df.to_sql('ohlcv_data', con=engine, if_exists='append', index=False)
+    print(f"Successfully saved {len(df)} rows to SQL!")
+
+# Execute the pipeline
+if __name__ == "__main__":
+    fetch_and_store_ohlcv('BTC/USDT', '1h', limit=500)
