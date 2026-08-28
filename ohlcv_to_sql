@@ -31,6 +31,6 @@ def fetch_and_store_ohlcv(symbol, timeframe, limit=100):
     df.to_sql('ohlcv_data', con=engine, if_exists='append', index=False)
     print(f"Successfully saved {len(df)} rows to SQL!")
 
-# Execute the pipeline
+# Execute the pipelinee
 if __name__ == "__main__":
     fetch_and_store_ohlcv('BTC/USDT', '1h', limit=500)
